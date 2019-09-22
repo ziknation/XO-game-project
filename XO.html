@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>XO</title>
+	<meta charset="utf-8">
+	<style type="text/css">
+
+		#mainDiv{
+
+		}
+
+ 		table{
+ 			border-collapse: collapse;
+ 			float: left;
+ 			margin-left: 7%;
+ 		}
+
+ 		td{
+ 			width: 200px;
+			height: 200px;
+			border: 2px solid black;
+			text-align: center;
+			font-size: 60px;
+ 		}
+
+ 		#sidebar{
+ 			border: 1px solid black;
+ 			width: 300px;
+ 			height: 135px;
+ 			margin-right: 7%;
+ 			float: right;
+ 			padding: 15px;
+ 			font-size: 20px;
+ 		}
+
+ 		#sidebar p{
+ 			margin: 0;
+ 			margin-top: 10px;
+ 			display: inline-block;
+ 		}
+
+ 		#startAgain{
+ 			width: 137px;
+ 			height: 35px;
+ 			font-size: 15px;
+ 			float: right;
+ 			margin-top: 5px;
+ 		}
+
+ 		#playItself{
+ 			width: 137px;
+ 			height: 35px;
+ 			font-size: 15px;
+ 			float: right;
+ 			margin-top: -18px;
+ 		}
+
+	</style>
+</head>
+<body>
+
+<div id="mainDiv">
+	<table>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+	<div id="sidebar">
+		<p>Сейчас ходит: <span id="nowWalks"></span></p>
+		<button id="startAgain">Новая игра</button>
+		<p>Выйграл X: <span id="winX">0</span></p>
+		<button id="playItself">Ну попробуй</button>
+		<p>Выйграл 0: <span id="win0">0</span></p><br>
+		<p>Ничья: <span id="draw">0</span></p>
+
+	</div>
+</div>
+
+</body>
+<script type="text/javascript">
+	
+	var nowWalks = document.getElementById('nowWalks');
+	var startAgain = document.getElementById('startAgain');
+	var playItself = document.getElementById('playItself');
+	playItself.addEventListener('click',timer);
+	startAgain.addEventListener('click',newGame);
+	nowWalks.innerHTML = 'X';
+
+	var winX = document.getElementById('winX');
+	var win0 = document.getElementById('win0');
+	var draw = document.getElementById('draw');
+
+	var tds = document.getElementsByTagName('td');
+	for (var i = 0; i < tds.length; i++){
+		tds[i].addEventListener('click',writeXO);
+		tds[i].addEventListener('mousemove',likeHoverOn);
+		tds[i].addEventListener('mouseout',likeHoverOff);
+	}
+	var flag = true;
+
+	function likeHoverOn(){
+		this.style.backgroundColor = '#999999';
+	}
+
+	function likeHoverOff(){
+		this.style.backgroundColor = 'white';
+	}
+
+	function newGame(){
+		for (var i = 0; i < tds.length; i++){
+			tds[i].innerHTML = '';
+			tds[i].addEventListener('click',writeXO);
+			tds[i].style.backgroundColor = 'white';
+			tds[i].addEventListener('mousemove',likeHoverOn);
+			tds[i].addEventListener('mouseout',likeHoverOff);
+		}
+	}
+
+	function writeXO(){
+		this.removeEventListener('click',writeXO);
+		this.removeEventListener('mousemove',likeHoverOn);
+		this.removeEventListener('mouseout',likeHoverOff);
+		if(flag){
+			this.innerHTML = 'X';
+			flag = false;
+			window.currentSign = 'X';
+			nowWalks.innerHTML = '0';
+			this.style.backgroundColor = "#FF4F19";
+		}
+		else{
+			this.innerHTML = '0';
+			flag = true;
+			window.currentSign = '0';
+			nowWalks.innerHTML = 'X';
+			this.style.backgroundColor = "#B7FF64";
+		}
+		fillArr();
+	}
+
+	function fillArr(){
+		var mainArr = [];
+		var curentTd = 0;
+		for (var i = 0; i < 3; i++){
+			var curentArr = [];
+			for (var j = 0; j < 3; j++){
+				curentArr.push(tds[curentTd].innerHTML);
+				curentTd++;
+			}
+			mainArr.push(curentArr);
+		}
+		checkArr(mainArr);
+	}
+
+	function checkArr(mainArr){
+		for (var i = 0; i < 3; i++){
+			if (mainArr[i][0] == mainArr[i][1] &&  mainArr[i][1] == mainArr[i][2] && mainArr[i][1] != ''){
+				alert('Победил ' + currentSign);
+				countingWins();
+				stopTimer();
+				delEvents();
+				return;
+			}
+		}
+		for (var i = 0; i < 3; i++){
+			if(mainArr[0][i] == mainArr[1][i] && mainArr[0][i] == mainArr[2][i] && mainArr[2][i] != ''){
+				alert('Победил ' + currentSign);
+				countingWins();
+				stopTimer();
+				delEvents();
+				return;
+			}
+		}
+		if (mainArr[0][0] == mainArr[1][1] && mainArr[0][0] == mainArr[2][2] && mainArr[2][2] != ''){
+			alert('Победил ' + currentSign);
+			countingWins();
+			stopTimer();
+			delEvents();
+			return;
+		}
+		if (mainArr[2][0] == mainArr[1][1] && mainArr[2][0] == mainArr[0][2] && mainArr[0][2] != ''){
+			alert('Победил ' + currentSign);
+			countingWins();
+			stopTimer();
+			delEvents();
+			return;
+		}
+
+		var allFilled = true;
+		for (var i = 0; i < tds.length; i++){
+			if(tds[i].innerHTML == ''){
+				allFilled = false;
+			}
+		}
+		if(allFilled){
+			for (var i = 0; i < tds.length; i++){
+				tds[i].style.backgroundColor = '#FFF346';
+			}
+			draw.innerHTML = Number(draw.innerHTML) + 1;
+			stopTimer();
+			alert('Ничья');
+		}
+	}
+
+	function countingWins(){
+		if (currentSign == 'X'){
+			winX.innerHTML = Number(winX.innerHTML) + 1;
+		}
+		else{
+			win0.innerHTML = Number(win0.innerHTML) + 1;
+		}
+	}
+
+	function delEvents(){
+		for (var i = 0; i < tds.length; i++){
+			tds[i].removeEventListener('click',writeXO);
+		}
+	}
+
+	function timer(){
+		newGame();
+		for (var i = 0; i < tds.length; i++){
+			tds[i].removeEventListener('click',writeXO);
+			tds[i].removeEventListener('mousemove',likeHoverOn);
+			tds[i].removeEventListener('mouseout',likeHoverOff);
+		}
+		window.randomArr = [0,1,2,3,4,5,6,7,8];
+		window.timerId = window.setInterval(steps,500);
+	}
+
+	function steps(){		
+		var randomTd = Math.floor(Math.random()*9);
+		var filled = tds[randomTd].innerHTML;
+		if(filled != ''){
+			steps();
+			return;
+		}
+
+		if(flag){
+			tds[randomTd].innerHTML = 'X';
+			flag = false;
+			window.currentSign = 'X';
+			nowWalks.innerHTML = '0';
+			tds[randomTd].style.backgroundColor = "#FF4F19";
+		}
+		else{
+			tds[randomTd].innerHTML = '0';
+			flag = true;
+			window.currentSign = '0';
+			nowWalks.innerHTML = 'X';
+			tds[randomTd].style.backgroundColor = "#B7FF64";
+		}
+		fillArr();
+	}
+
+	function stopTimer(){
+		clearInterval(timerId);
+	}
+
+</script>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
